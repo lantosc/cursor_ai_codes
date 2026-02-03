@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Tic Tac Toe</title>
+    <style>
+      body {
+          background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+          font-family: 'Segoe UI', Arial, sans-serif;
+          text-align: center;
+          min-height: 100vh;
+          margin: 0;
+      }
+      .game-board {
+          display: grid;
+          grid-template-columns: repeat(3, 100px);
+          grid-template-rows: repeat(3, 100px);
+          gap: 15px;
+          margin: 40px auto 20px auto;
+          width: max-content;
+          background: rgba(255,255,255,0.3);
+          border-radius: 20px;
+          box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.18);
+          padding: 20px;
+      }
+      .cell {
+          background: linear-gradient(135deg, #fff 60%, #e0c3fc 100%);
+          border: 2.5px solid #7f53ac;
+          border-radius: 16px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 2.5em;
+          font-weight: bold;
+          color: #7f53ac;
+          cursor: pointer;
+          box-shadow: 0 2px 8px rgba(127, 83, 172, 0.08);
+          transition:
+              background 0.3s cubic-bezier(.4,2,.6,1),
+              transform 0.15s cubic-bezier(.4,2,.6,1),
+              box-shadow 0.2s;
+          user-select: none;
+          position: relative;
+          overflow: hidden;
+      }
+      .cell:hover {
+          background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
+          transform: scale(1.07) rotate(-2deg);
+          box-shadow: 0 4px 16px rgba(127, 83, 172, 0.18);
+      }
+      .cell:active {
+          transform: scale(0.97);
+      }
+      .cell.filled {
+          animation: popIn 0.35s cubic-bezier(.4,2,.6,1);
+      }
+      .cell.new-move{
+          animation: pop 0.3s ease;
+      }
+      .winner {
+          background: linear-gradient(90deg, #7f53ac 0%, #647dee 100%) !important;
+          color: #fff !important;
+      }
+      .reset-btn {
+          margin-top: 1.5em;
+          padding: 0.6em 2em;
+          font-size: 1.1em;
+          font-weight: bold;
+          color: #fff;
+          background: linear-gradient(90deg, #7f53ac 0%, #647dee 100%);
+          border: none;
+          border-radius: 12px;
+          box-shadow: 0 2px 12px rgba(127, 83, 172, 0.18);
+          cursor: pointer;
+          transition: background 0.3s, color 0.3s, transform 0.2s;
+          letter-spacing: 1px;
+      }
+      .reset-btn:hover {
+          background: linear-gradient(90deg, #647dee 0%, #7f53ac 100%);
+          color: #fff;
+          transform: scale(1.05);
+      }
+      @keyframes popIn {
+          0% { transform: scale(0.5); opacity: 0.2; }
+          70% { transform: scale(1.15); opacity: 1; }
+          100% { transform: scale(1); }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Let's Play Tic Tac Toe</h1>
+    <div class="game-board">
+      <div class="cell" onclick="makeMove(0)"></div>
+      <div class="cell" onclick="makeMove(1)"></div>
+      <div class="cell" onclick="makeMove(2)"></div>
+      <div class="cell" onclick="makeMove(3)"></div>
+      <div class="cell" onclick="makeMove(4)"></div>
+      <div class="cell" onclick="makeMove(5)"></div>
+      <div class="cell" onclick="makeMove(6)"></div>
+      <div class="cell" onclick="makeMove(7)"></div>
+      <div class="cell" onclick="makeMove(8)"></div>
+    </div>
+
+    <p
+      id="status"
+      style="
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #fff;
+            background: linear-gradient(90deg, #7f53ac 0%, #647dee 100%);
+            padding: 0.6em 1.5em;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(127, 83, 172, 0.18);
+            display: inline-block;
+            margin-top: 1.2em;
+            letter-spacing: 1px;
+            transition: background 0.3s, color 0.3s, transform 0.2s;
+            animation: statusPop 0.5s cubic-bezier(.4,2,.6,1);
+        "
+    >
+      Player X's turn
+    </p>
+    <style>
+      @keyframes statusPop {
+          0% { transform: scale(0.7); opacity: 0.2; }
+          70% { transform: scale(1.1); opacity: 1; }
+          100% { transform: scale(1); }
+      }
+    </style>
+    <br />
+    <button class="reset-btn" onclick="resetGame()">Reset Game</button>
+    <script>
+      // Game state
+      let board = ["", "", "", "", "", "", "", "", ""];
+      let currentPlayer = "X";
+      let gameActive = true;
+
+      // Winning combinations
+      const winCombos = [
+          [0,1,2], [3,4,5], [6,7,8], // rows
+          [0,3,6], [1,4,7], [2,5,8], // columns
+          [0,4,8], [2,4,6]           // diagonals
+      ];
+
+      function makeMove(index) {
+          if (!gameActive || board[index] !== "") return;
+
+          board[index] = currentPlayer;
+          document.getElementsByClassName('cell')[index].textContent = currentPlayer;
+          document.getElementsByClassName('cell')[index].classList.add(currentPlayer.toLowerCase(), 'new-move');
+
+           setTimeout(() => document.getElementsByClassName('cell')[index].classList.remove('new-move'), 300);
+
+          if (checkWin()) {
+              highlightWinningCells();
+              document.getElementById('status').textContent = `Player ${currentPlayer} wins!`;
+              gameActive = false;
+              return;
+          }
+
+          if (board.every(cell => cell !== "")) {
+              document.getElementById('status').textContent = "It's a draw!";
+              gameActive = false;
+              return;
+          }
+
+          currentPlayer = currentPlayer === "X" ? "O" : "X";
+          document.getElementById('status').textContent = `Player ${currentPlayer}'s turn`;
+      }
+
+      function checkWin() {
+          return winCombos.some(combo =>
+              board[combo[0]] === currentPlayer &&
+              board[combo[1]] === currentPlayer &&
+              board[combo[2]] === currentPlayer
+          );
+      }
+
+      function highlightWinningCells() {
+          winCombos.forEach(combo => {
+              if (combo.every(index => board[index] === currentPlayer)) {
+                  combo.forEach(index => {
+                      document.getElementsByClassName('cell')[index].classList.add('winner');
+                  });
+              }
+          });
+      }
+
+      function resetGame() {
+          board = ["", "", "", "", "", "", "", "", ""];
+          currentPlayer = "X";
+          gameActive = true;
+          const cells = document.getElementsByClassName('cell');
+          for (let i = 0; i < cells.length; i++) {
+              cells[i].textContent = "";
+              cells[i].classList.remove('x', 'o', 'winner', 'new-move');
+          }
+          document.getElementById('status').textContent = "Player X's turn";
+      }
+    </script>
+  </body>
+</html>
+
