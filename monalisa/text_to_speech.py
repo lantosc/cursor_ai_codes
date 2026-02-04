@@ -63,6 +63,20 @@ class TextToSpeech:
             self.is_speaking = False
             return None
     
+    def play_audio_file(self, audio_path, callback=None):
+        """
+        Play an existing audio file (no generation). Use when you already have
+        the file and want to start playback in sync with animation.
+        """
+        if not audio_path or not os.path.exists(audio_path):
+            if callback:
+                callback()
+            return
+        self.is_speaking = True
+        thread = threading.Thread(target=self._play_audio, args=(audio_path, callback))
+        thread.daemon = True
+        thread.start()
+    
     def _play_audio(self, audio_path, callback):
         """Play audio file"""
         try:

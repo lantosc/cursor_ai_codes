@@ -307,25 +307,27 @@ class AdvancedFaceAnimator:
         except Exception as e:
             print(f"Warping error: {e}")
     
-    def animate_with_audio(self, audio_path, duration=None, update_callback=None):
-        """Animate face synchronized with audio"""
+    def animate_with_audio(self, audio_path, duration=None, update_callback=None, pre_viseme_sequence=None):
+        """Animate face synchronized with audio. If pre_viseme_sequence is provided, skip analysis and start immediately."""
         import os  # Ensure os is available
         if not os.path.exists(audio_path):
             print(f"Audio file not found: {audio_path}")
-            # Fallback to basic animation
             self._fallback_animation(duration, update_callback)
             return
         
-        if not self.audio_analyzer:
+        if not self.audio_analyzer and not pre_viseme_sequence:
             print("Audio analyzer not available, using fallback animation")
             self._fallback_animation(duration, update_callback)
             return
         
         try:
-            # Analyze audio
-            print("Analyzing audio for visemes...")
-            self.viseme_sequence = self.audio_analyzer.analyze_audio(audio_path)
-            self.current_audio_path = audio_path
+            if pre_viseme_sequence is not None:
+                self.viseme_sequence = pre_viseme_sequence
+                self.current_audio_path = audio_path
+            else:
+                print("Analyzing audio for visemes...")
+                self.viseme_sequence = self.audio_analyzer.analyze_audio(audio_path)
+                self.current_audio_path = audio_path
             
             if not self.viseme_sequence:
                 print("Could not extract visemes from audio, using fallback")
