@@ -16,7 +16,7 @@ An interactive application that allows you to chat with the Mona Lisa painting u
 - Python 3.8 or higher
 - A microphone (for voice input)
 - Internet connection (for speech recognition and text-to-speech)
-- Optional: OpenAI API key (for better AI responses)
+- Optional: OpenAI API key from https://platform.openai.com (for GPT-powered chat; separate from Cursor Pro)
 
 ## Installation
 
@@ -34,10 +34,11 @@ pipwin install pyaudio
 3. Download a Mona Lisa image and save it as `mona_lisa.jpg` in the `monalisa` folder.
    - You can download one from: https://en.wikipedia.org/wiki/Mona_Lisa#/media/File:Mona_Lisa,_by_Leonardo_da_Vinci,_from_C2RMF_retouched.jpg
 
-4. (Optional) For better AI responses, create a `.env` file with your OpenAI API key:
-```
-OPENAI_API_KEY=your_api_key_here
-```
+4. (Optional) For GPT-powered chat, create a `.env` file in the `monalisa` folder (the app does not ship with one):
+   - Copy `.env.example` to `.env`
+   - Get an API key at https://platform.openai.com/api-keys (sign up or log in to OpenAI)
+   - Put your key in `.env`: `OPENAI_API_KEY=sk-your-key-here`
+   - **Note:** Cursor Pro does not include OpenAI API access; you need a separate OpenAI account and key for this.
 
 ## Usage
 
@@ -71,7 +72,8 @@ monalisa/
 ├── requirements.txt             # Python dependencies
 ├── README.md                    # This file
 ├── mona_lisa.jpg                # Mona Lisa image (user provided)
-└── .env                         # Environment variables (optional)
+├── .env.example                 # Template for .env (copy to .env and add your key)
+└── .env                         # Your secrets (create from .env.example; not in repo)
 ```
 
 ## How It Works
@@ -98,10 +100,11 @@ monalisa/
 - Try speaking more clearly or in a quieter environment
 - Increase the timeout in `speech_recognition_module.py` if needed
 
-### OpenAI API Errors
-- If you get API errors, the app will fall back to simple rule-based responses
-- Check your API key is correct in the `.env` file
-- Ensure you have API credits available
+### OpenAI / GPT chat not working
+- The app uses **OpenAI’s API** (platform.openai.com), not Cursor. Cursor Pro does not provide an OpenAI API key.
+- Create a `.env` file in the `monalisa` folder (copy from `.env.example`) and set `OPENAI_API_KEY=sk-your-key`.
+- Get a key at https://platform.openai.com/api-keys (OpenAI account and billing may be required).
+- If the key is missing or invalid, the app falls back to rule-based responses.
 
 ## Future Enhancements
 
